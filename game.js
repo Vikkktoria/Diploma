@@ -39,9 +39,11 @@ class Actor  {
     this.size = size;
     this.speed = speed;
 
-    Object.defineProperty (this, 'type', {value: 'actor', enumerable: true });
+    // Object.defineProperty (this, 'type', {value: 'actor', enumerable: true });
   }
-
+  get type() {
+    return 'actor';
+  }
   get left() {return this.pos.x;}
   get top() {return this.pos.y;}
   get right() {return this.pos.x + this.size.x;}
@@ -73,10 +75,17 @@ class Level {
 
     this.height = grid.length;
 
-    let maxInd = 0;
-    // for (let gr of grid) {
-    //   if (gr.length > maxInd) {maxInd = gr.length;}}
-    // this.width = maxInd;
+    // let gr = Array.of(0);
+    // grid.forEach(function(el) {
+    //   gr.push(el.length);
+    // })
+    // this.width = Math.max(...gr);
+
+    let maxInt = 0;
+    grid.forEach(function(el) {
+        maxInt = Math.max(maxInt, el.length);
+      })
+    this.width = maxInt;
 
     this.status = null;
 
@@ -87,10 +96,7 @@ class Level {
       return el.type === 'player';
     })
     this.player = pl;
-    // this.player.type = 'player';
-    // {
-    //   type : 'player'
-    // };
+
 
   }
 
@@ -116,72 +122,65 @@ class Level {
   }
 
   obstacleAt(pos, size) {
-    // if (!(pos instanceof Vector)||(!(size instanceof Vector))) {
-    //   throw('Неверный тип данных');
-    // }
-    //
-    // if((pos.x < 0)||(pos.y < 0)||(pos.x + size.x > this.width)) {
-    //   return 'wall';
-    // }
-    //
-    // if (pos.y + size.y > this.width) {
-    //   return 'lava';
-    // }
-    //
-    // let obstacle = '';
-    // for (let i = pos.y; i <= (pos.y + size.y); i++) {
-    //   for (let j = pos.x; j <= (pos.x + size.x); j++) {
-    //     if (this.grid[i][j] !== undefined) {
-    //       obstacle = obstacle + ', ' + this.grid[i][j];
-    //     }
-    //   }
-    // }
-    // if (obstacle === '') {
-    //   return undefined;
-    // } else {
-    //   return obstacle;
-    // }
-    //
-    // return undefined;
+    if (!(pos instanceof Vector)||(!(size instanceof Vector))) {
+      throw('Неверный тип данных');
+    }
+
+    //Пересекается со стеной - выходит за пределы поля
+    if((pos.x < 0)||(pos.y < 0)||(pos.x + size.x > this.width)) {
+      return 'wall';
+    }
+
+    //Пересекается с лавой - выходит за пределы поля внизу
+    if (pos.y + size.y > this.width) {
+      return 'lava';
+    }
+
+    for (let i = Math.floor(pos.y); i < Math.ceil(pos.y + size.y); i++) {
+      for (let j = Math.floor(pos.x); j < Math.ceil(pos.x + size.x); j++) {
+        if (this.grid[i][j] !== undefined) {
+          return this.grid[i][j];
+        }
+      }
+    }
+
+    return undefined;
   }
 
   removeActor(actor){
-    // if(actor !== undefined) {
-    //   actor = null;
-    // }
+    for (let act of this.actors) {
+      if (act === actor) {
+        this.actors.splice(act, 1);
+      }
+    }
   }
 
-  noMoreActors(type){
+  noMoreActors(type) {
     for (let actor of this.actors) {
-        if(type === actor.type.valu) {
+        if (type === actor.type) {
           return false;
       }
     }
     return true;
   }
 
-  // noMoreActors(type){
-    // for (let i = 0; i<= this.height; i++) {
-    //   for (let j = 0; j<= this.width; j++) {
-    //     if(type === grid[i][j]) {
-    //       return false;
-    //     }
-    //   }
-    // }
-  //   return true;
-  // }
-
 
   playerTouched(type, actor) {
-    if ((type === 'lava')||(type === 'fireball')) {
-      this.status = 'lost';
-    }
-    if ((type === 'coin')&&(actor.type === 'coin')) {
-      actor = null;
+    if (this.status !== null) { return; }
+    if ((type === 'lava')||(type === 'fireball')) { this.status = 'lost'; }
+    if ((type === 'coin')&&(actor instanceof Actor)&&(actor.type === 'coin')) {
+      this.removeActor(actor);
       if (this.noMoreActors('coin')) {
         this.status = 'won';
       }
     }
   }
-
 }
+
+
+const grid = [
+  new Array(3),
+  ['wall', 'wall', 'lava']
+];
+const level = new Level(grid);
+runLevel(level, DOMDisplay);
