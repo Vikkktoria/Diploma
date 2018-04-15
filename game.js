@@ -157,16 +157,16 @@ class Level {
   }
 
   noMoreActors(type) {
-    // for (let actor of this.actors) {
-    //     if (type === actor.type) {
-    //       return false;
-    //   }
-    // }
-    this.actors.forEach(function(element) {
-      if (type === element.type) {
-        return false;
+    for (let actor of this.actors) {
+        if (type === actor.type) {
+          return false;
       }
-    });
+    }
+    // this.actors.forEach(function(element) {
+    //   if (type === element.type) {
+    //     return false;
+    //   }
+    // });
     return true;
   }
 
@@ -278,18 +278,46 @@ class Fireball extends Actor {
 
 }
 
-class HorizontalFireball {}
+//Горизонтальная шаровая молния
+class HorizontalFireball extends Fireball {
+  constructor(pos) {
+    super(pos);
+    this.size = new Vector (1, 1);
+    this.speed = new Vector(2, 0);
+  }
+}
 
-class VerticalFireball {}
+//Вертикальная шаровая молния
+class VerticalFireball extends Fireball {
+  constructor(pos) {
+    super(pos);
+    this.size = new Vector (1, 1);
+    this.speed = new Vector(0, 2);
+  }
+}
+
+//Огненный дождь
+class FireRain extends Fireball{
+  constructor(pos) {
+    super(pos);
+    this.position = pos;
+    this.size = new Vector (1, 1);
+    this.speed = new Vector(0, 3);
+  }
+
+  handleObstacle() {
+    this.pos = this.position ;
+  }
+}
 
 
-class FireRain {}
 
 
 
 class Coin extends Actor {
   constructor (pos = new Vector(0,0)) {
     super ();
+    this.position = new Vector (pos.x + 0.2, pos.y + 0.1);
     this.pos = new Vector (pos.x + 0.2, pos.y + 0.1);
     this.size = new Vector(0.6, 0.6);
     this.springSpeed = 8;
@@ -309,13 +337,14 @@ class Coin extends Actor {
     return new Vector(0, Math.sin(this.spring) * this.springDist);
   }
 
-  getNextPosition() {
+  getNextPosition(time = 1) {
     this.updateSpring(time);
-    new Vector();
+    let springVector = this.getSpringVector();
+    return new Vector(this.position.x, this.position.y + springVector.y);
   }
 
   act(time) {
-
+    this.pos = this.getNextPosition(time);
   }
 
 
