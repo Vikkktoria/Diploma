@@ -233,15 +233,20 @@ class LevelParser  {
       for (let i in proGrid) {
         proGrid[i] = proGrid[i].split('');
         for (let j in proGrid[i]) {
-          if ((this.dictionary[proGrid[i][j]] === Actor)||(this.dictionary[proGrid[i][j]] instanceof Actor)) {
-            grid.push(new Actor(new Vector(j, i)));
+          if ((this.dictionary[proGrid[i][j]] !== undefined)&&((this.dictionary[proGrid[i][j]] === Actor)||(this.dictionary[proGrid[i][j]].prototype instanceof Actor))) {
+            grid.push(new this.dictionary[proGrid[i][j]](new Vector(j, i)));
           }
         }
       }
       return grid;
     }
 
-
+    // parse (proGrid) {
+    //     let grid = this.createGrid(proGrid);
+    //
+    //
+    //     return grid;
+    //   }
 
 
 }
@@ -363,3 +368,16 @@ class Player extends Actor{
     return 'player';
   }
 }
+
+
+
+//СЛОВАРЬ
+let dictionary = {
+  'x' : 'wall',
+  '!' : 'lava',
+  '@' : Player,
+  'o' : Coin,
+  '=' : HorizontalFireball,
+  '|' : VerticalFireball,
+  'v' : FireRain
+};
