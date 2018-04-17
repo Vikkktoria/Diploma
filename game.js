@@ -167,19 +167,6 @@ class Level {
     return true;
   }
 
-
-  // playerTouched(type, actor) {
-  //   if (this.status !== null) { return; }
-  //   if ((type === 'lava')||(type === 'fireball')) { this.status = 'lost'; }
-  //   if ((type === 'coin')&&(actor instanceof Actor)&&(actor.type === 'coin')) {
-  //     this.removeActor(actor);
-  //     if (this.noMoreActors('coin')) {
-  //       this.status = 'won';
-  //     }
-  //   }
-  // }
-
-
   playerTouched(type, actor) {
     if (this.status !== null) { return; }
     if ((type === 'lava')||(type === 'fireball')) {
@@ -190,12 +177,14 @@ class Level {
       }
       if (this.noMoreActors('coin')) {
         this.status = 'won';
+        alert('Вы выиграли!');
+
       }
     }
   }
 }
 
-// ЗАПУСК ИГРЫ
+// // ЗАПУСК ИГРЫ
 // const grid = [
 //   new Array(3),
 //   ['wall', 'wall', 'lava']
@@ -323,14 +312,12 @@ class Player extends Actor{
 let bigDictionary = {
   'x' : 'wall',
   '!' : 'lava',
-  // '@' : Player,
-  // 'o' : Coin,
-  // '=' : HorizontalFireball,
-  // '|' : VerticalFireball,
-  // 'v' : FireRain
+  '@' : Player,
+  'o' : Coin,
+  '=' : HorizontalFireball,
+  '|' : VerticalFireball,
+  'v' : FireRain
 };
-
-
 
 
 //ПАРСЕР УРОВНЯ
@@ -399,11 +386,3 @@ class LevelParser {
   }
 
 }
-
-//ПРОВЕРКА ПАРСЕРА
-// const plan = [
-//   ' @ ',
-//   'x!x'
-// ];
-// const parser = new LevelParser();
-// const actors = parser.createActors(plan);
