@@ -28,10 +28,7 @@ class Vector  {
 
 // ДВИЖУЩИЙСЯ ОБЪЕКТ
 class Actor  {
-  constructor (position, size, speed) {
-    if (position === undefined) { position = new Vector(0, 0)}
-    if (size === undefined) { size = new Vector(1, 1)}
-    if (speed === undefined) { speed = new Vector(0, 0)}
+  constructor (position = new Vector(0, 0), size  = new Vector(1, 1), speed = new Vector(0, 0)) {
     if (!(position instanceof Vector)||!(size instanceof Vector)||!(speed instanceof Vector)) {
       throw new Error('Данные не типа Vector');
     }
@@ -326,11 +323,11 @@ class Player extends Actor{
 let bigDictionary = {
   'x' : 'wall',
   '!' : 'lava',
-  '@' : Player,
-  'o' : Coin,
-  '=' : HorizontalFireball,
-  '|' : VerticalFireball,
-  'v' : FireRain
+  // '@' : Player,
+  // 'o' : Coin,
+  // '=' : HorizontalFireball,
+  // '|' : VerticalFireball,
+  // 'v' : FireRain
 };
 
 
@@ -339,7 +336,7 @@ let bigDictionary = {
 //ПАРСЕР УРОВНЯ
 class LevelParser {
   constructor (dictionary) {
-    this.dictionary = Object.assign({}, dictionary, bigDictionary);
+    this.dictionary = Object.assign({},bigDictionary, dictionary);
     // this.dictionary = dictionary;
   }
 
@@ -364,7 +361,7 @@ class LevelParser {
     let grid = [];
     for (let i in proGrid) {
       grid[i] = [];
-      proGrid[i] = proGrid[i].split('');
+      if (typeof proGrid[i] === String) {proGrid[i] = proGrid[i].split('');}
       for (let j in proGrid[i]) {
         grid[i].push(this.obstacleFromSymbol(proGrid[i][j]));
       }
@@ -373,34 +370,32 @@ class LevelParser {
   }
 
   createActors (proGrid) {
+    if (this.dictionary === {}) {return []}
     let actors = [];
-    for (let i in proGrid) {
-      proGrid[i] = proGrid[i].split('');
-      // console.log(proGrid[i]);
+    for (let i = 0; i < proGrid.length; i++) {
 
-      for (let j in proGrid[i]) {
+      for (let j = 0; j < proGrid[i].length; j++) {
         let symb = proGrid[i][j];
         if (symb !== ' ' && symb in this.dictionary) {
           if (this.actorFromSymbol(symb).prototype instanceof Actor ||this.actorFromSymbol(symb) === Actor){
-            actors.push(new this.dictionary[symb](new Vector(j, i)));
-            // console.log(new this.dictionary[symb](new Vector(i, j)));
+            let newActor = new this.dictionary[symb](new Vector (j, i));
+            // newActor.pos = new Vector (j, i);
+            actors.push(newActor);
           }
-
         }
-
-
-
       }
     }
     return actors;
-
   }
 
   parse (proGrid) {
     let grid = this.createGrid(proGrid);
+    let actors = this.createActors(proGrid);
+    actors.forEach(function(el) {
+      grid[el.pos.y][el.pos.x] = proGrid[el.pos.y].substr(el.pos.x, 1);
+    });
 
-
-    return grid;
+    return new Level(grid, actors);
   }
 
 }
