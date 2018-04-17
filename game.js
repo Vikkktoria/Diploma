@@ -152,7 +152,7 @@ class Level {
 
     let ind = this.actors.indexOf(actor);
     if (ind !== -1) {
-      this.actors.splice(this.actors[ind], 1);
+      this.actors.splice(ind, 1);
     }
   }
 
@@ -171,11 +171,26 @@ class Level {
   }
 
 
+  // playerTouched(type, actor) {
+  //   if (this.status !== null) { return; }
+  //   if ((type === 'lava')||(type === 'fireball')) { this.status = 'lost'; }
+  //   if ((type === 'coin')&&(actor instanceof Actor)&&(actor.type === 'coin')) {
+  //     this.removeActor(actor);
+  //     if (this.noMoreActors('coin')) {
+  //       this.status = 'won';
+  //     }
+  //   }
+  // }
+
+
   playerTouched(type, actor) {
     if (this.status !== null) { return; }
-    if ((type === 'lava')||(type === 'fireball')) { this.status = 'lost'; }
-    if ((type === 'coin')&&(actor instanceof Actor)&&(actor.type === 'coin')) {
-      this.removeActor(actor);
+    if ((type === 'lava')||(type === 'fireball')) {
+      this.status = 'lost';
+    } else if ((type === 'coin')&&(actor !== undefined)) {
+      if (actor.type === 'coin') {
+        this.removeActor(actor);
+      }
       if (this.noMoreActors('coin')) {
         this.status = 'won';
       }
@@ -192,64 +207,7 @@ class Level {
 // runLevel(level, DOMDisplay);
 
 
-class LevelParser  {
-  constructor (dictionary) {
-    this.dictionary = dictionary;
-
-
-  }
-
-  actorFromSymbol(symb) {
-    if (symb === undefined) {
-      return undefined;
-    }
-    return this.dictionary[symb];
-  }
-
-  obstacleFromSymbol (symb) {
-      if (symb === 'x') {
-        return 'wall';
-      } else if (symb === '!') {
-        return 'lava';
-      } else {
-        return undefined;
-      }
-    }
-
-    createGrid (proGrid) {
-      let grid = [];
-      for (let i in proGrid) {
-        grid[i] = [];
-        proGrid[i] = proGrid[i].split('');
-        for (let j in proGrid[i]) {
-          grid[i].push(this.obstacleFromSymbol(proGrid[i][j]));
-        }
-      }
-      return grid;
-    }
-
-    createActors (proGrid) {
-      let grid = [];
-      for (let i in proGrid) {
-        proGrid[i] = proGrid[i].split('');
-        for (let j in proGrid[i]) {
-          if ((this.dictionary[proGrid[i][j]] !== undefined)&&((this.dictionary[proGrid[i][j]] === Actor)||(this.dictionary[proGrid[i][j]].prototype instanceof Actor))) {
-            grid.push(new this.dictionary[proGrid[i][j]](new Vector(j, i)));
-          }
-        }
-      }
-      return grid;
-    }
-
-    // parse (proGrid) {
-    //     let grid = this.createGrid(proGrid);
-    //
-    //
-    //     return grid;
-    //   }
-
-
-}
+//Шаровая молния
 class Fireball extends Actor {
   constructor (pos = new Vector(0,0), speed = new Vector(0,0)) {
     super (pos);
@@ -261,11 +219,11 @@ class Fireball extends Actor {
   }
 
   getNextPosition(time = 1) {
-     return new Vector(this.pos.x + this.speed.x * time, this.pos.y + this.speed.y * time);
-   }
+    return new Vector(this.pos.x + this.speed.x * time, this.pos.y + this.speed.y * time);
+  }
 
   handleObstacle() {
-    this.speed = new Vector (this.speed.x * (-1), this.speed.y * (-1) );
+    this.speed = new Vector (this.speed.x * (-1), this.speed.y * (-1));
   }
 
   act(time, level) {
@@ -278,10 +236,8 @@ class Fireball extends Actor {
     }
   }
 
-
-
-
 }
+
 
 //Горизонтальная шаровая молния
 class HorizontalFireball extends Fireball {
@@ -302,7 +258,7 @@ class VerticalFireball extends Fireball {
 }
 
 //Огненный дождь
-class FireRain extends Fireball{
+class FireRain extends Fireball {
   constructor(pos) {
     super(pos);
     this.position = pos;
@@ -316,9 +272,7 @@ class FireRain extends Fireball{
 }
 
 
-
-
-
+//Монета
 class Coin extends Actor {
   constructor (pos = new Vector(0,0)) {
     super ();
@@ -328,7 +282,6 @@ class Coin extends Actor {
     this.springSpeed = 8;
     this.springDist = 0.07;
     this.spring = Math.random() * 2* Math.PI;
-
   }
   get type() {
     return 'coin';
@@ -344,18 +297,18 @@ class Coin extends Actor {
 
   getNextPosition(time = 1) {
     this.updateSpring(time);
-    let springVector = this.getSpringVector();
-    return new Vector(this.position.x, this.position.y + springVector.y);
+    // let springVector = this.getSpringVector();
+    // return new Vector(this.position.x, this.position.y + springVector.y);
+    return this.position.plus(this.getSpringVector());
   }
 
   act(time) {
     this.pos = this.getNextPosition(time);
   }
 
-
-
 }
 
+//Игрок
 class Player extends Actor{
   constructor (pos = new Vector(0,0)) {
     super ();
@@ -369,10 +322,8 @@ class Player extends Actor{
   }
 }
 
-
-
 //СЛОВАРЬ
-let dictionary = {
+let bigDictionary = {
   'x' : 'wall',
   '!' : 'lava',
   '@' : Player,
@@ -381,3 +332,83 @@ let dictionary = {
   '|' : VerticalFireball,
   'v' : FireRain
 };
+
+
+
+
+//ПАРСЕР УРОВНЯ
+class LevelParser {
+  constructor (dictionary) {
+    this.dictionary = Object.assign({}, dictionary, bigDictionary);
+    // this.dictionary = dictionary;
+  }
+
+  actorFromSymbol(symb) {
+    if (symb === undefined) {
+      return undefined;
+    }
+    return this.dictionary[symb];
+  }
+
+  obstacleFromSymbol (symb) {
+    if (symb === 'x') {
+      return 'wall';
+    } else if (symb === '!') {
+      return 'lava';
+    } else {
+      return undefined;
+    }
+  }
+
+  createGrid (proGrid) {
+    let grid = [];
+    for (let i in proGrid) {
+      grid[i] = [];
+      proGrid[i] = proGrid[i].split('');
+      for (let j in proGrid[i]) {
+        grid[i].push(this.obstacleFromSymbol(proGrid[i][j]));
+      }
+    }
+    return grid;
+  }
+
+  createActors (proGrid) {
+    let actors = [];
+    for (let i in proGrid) {
+      proGrid[i] = proGrid[i].split('');
+      // console.log(proGrid[i]);
+
+      for (let j in proGrid[i]) {
+        let symb = proGrid[i][j];
+        if (symb !== ' ' && symb in this.dictionary) {
+          if (this.actorFromSymbol(symb).prototype instanceof Actor ||this.actorFromSymbol(symb) === Actor){
+            actors.push(new this.dictionary[symb](new Vector(j, i)));
+            // console.log(new this.dictionary[symb](new Vector(i, j)));
+          }
+
+        }
+
+
+
+      }
+    }
+    return actors;
+
+  }
+
+  parse (proGrid) {
+    let grid = this.createGrid(proGrid);
+
+
+    return grid;
+  }
+
+}
+
+//ПРОВЕРКА ПАРСЕРА
+// const plan = [
+//   ' @ ',
+//   'x!x'
+// ];
+// const parser = new LevelParser();
+// const actors = parser.createActors(plan);
