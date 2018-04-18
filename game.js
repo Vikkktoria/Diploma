@@ -36,7 +36,6 @@ class Actor  {
     this.size = size;
     this.speed = speed;
 
-    // Object.defineProperty (this, 'type', {value: 'actor', enumerable: true });
   }
   get type() {
     return 'actor';
@@ -177,8 +176,6 @@ class Level {
       }
       if (this.noMoreActors('coin')) {
         this.status = 'won';
-        alert('Вы выиграли!');
-
       }
     }
   }
@@ -386,3 +383,10 @@ class LevelParser {
   }
 
 }
+
+
+//ФИНАЛЬНЫЙ ЗАПУСК ИГРЫ
+let schemas = JSON.parse(loadLevels());
+const parser = new LevelParser();
+runGame(schemas, parser, DOMDisplay)
+  .then(() => alert('Вы выиграли!');
