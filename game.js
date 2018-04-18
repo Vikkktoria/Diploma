@@ -181,6 +181,9 @@ class Level {
   }
 }
 
+
+
+
 // // ЗАПУСК ИГРЫ
 // const grid = [
 //   new Array(3),
@@ -306,30 +309,41 @@ class Player extends Actor{
 }
 
 //СЛОВАРЬ
-let bigDictionary = {
-  'x' : 'wall',
-  '!' : 'lava',
-  '@' : Player,
-  'o' : Coin,
-  '=' : HorizontalFireball,
-  '|' : VerticalFireball,
-  'v' : FireRain
-};
+// let bigDictionary = {
+//   'x' : 'wall',
+//   '!' : 'lava',
+//   '@' : Player,
+//   'o' : Coin,
+//   '=' : HorizontalFireball,
+//   '|' : VerticalFireball,
+//   'v' : FireRain
+// };
 
 
 //ПАРСЕР УРОВНЯ
 class LevelParser {
   constructor (dictionary) {
-    this.dictionary = Object.assign({},bigDictionary, dictionary);
+    // this.dictionary = Object.assign({},bigDictionary, dictionary);
+
     // this.dictionary = dictionary;
+    dictionary['x'] = 'wall';
+    dictionary['!'] = 'lava';
+    dictionary['@'] = Player;
+    dictionary['o'] = Coin;
+    dictionary['='] = HorizontalFireball;
+    dictionary['|'] = VerticalFireball;
+    dictionary['v'] = FireRain;
+    this.dictionary = dictionary;
   }
 
   actorFromSymbol(symb) {
-    if (symb === undefined) {
-      return undefined;
-    }
     return this.dictionary[symb];
   }
+  //   if (symb === undefined) {
+  //     return undefined;
+  //   }
+  //   return this.dictionary[symb];
+  // }
 
   obstacleFromSymbol (symb) {
     if (symb === 'x') {
@@ -375,9 +389,9 @@ class LevelParser {
   parse (proGrid) {
     let grid = this.createGrid(proGrid);
     let actors = this.createActors(proGrid);
-    actors.forEach(function(el) {
-      grid[el.pos.y][el.pos.x] = proGrid[el.pos.y].substr(el.pos.x, 1);
-    });
+    // actors.forEach(function(el) {
+    //   grid[el.pos.y][el.pos.x] = proGrid[el.pos.y].substr(el.pos.x, 1);
+    // });
 
     return new Level(grid, actors);
   }
@@ -386,7 +400,34 @@ class LevelParser {
 
 
 //ФИНАЛЬНЫЙ ЗАПУСК ИГРЫ
-let schemas = JSON.parse(loadLevels());
-const parser = new LevelParser();
-runGame(schemas, parser, DOMDisplay)
-  .then(() => alert('Вы выиграли!');
+// let shemasPromise = new Promise(function(resolve, reject) {
+//   let jsonFromLL = loadLevels();
+//
+// });
+//
+// let postPromis = function () {
+//   let schemas = JSON.parse(jsonFromLL);
+//   const parser = new LevelParser();
+//   runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
+// };
+//
+// shemasPromise.then(postPromis());
+
+let jsonFromLL, schemas;
+let jsonPromise = function (callback) {
+  jsonFromLL = loadLevels();
+  callback();
+};
+
+let shemasPromise = function (callback) {
+  schemas = JSON.parse(jsonFromLL);
+  callback();
+};
+
+let postPromise = function () {
+  const parser = new LevelParser();
+  runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
+};
+jsonPromise(function() {
+  shemasPromise(postPromise);
+});
