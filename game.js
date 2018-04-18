@@ -400,19 +400,6 @@ class LevelParser {
 
 
 //ФИНАЛЬНЫЙ ЗАПУСК ИГРЫ
-// let shemasPromise = new Promise(function(resolve, reject) {
-//   let jsonFromLL = loadLevels();
-//
-// });
-//
-// let postPromis = function () {
-//   let schemas = JSON.parse(jsonFromLL);
-//   const parser = new LevelParser();
-//   runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
-// };
-//
-// shemasPromise.then(postPromis());
-
 let jsonFromLL, schemas;
 let jsonPromise = function (callback) {
   jsonFromLL = loadLevels();
@@ -428,6 +415,7 @@ let postPromise = function () {
   const parser = new LevelParser();
   runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
 };
+
 jsonPromise(function() {
-  shemasPromise(postPromise);
+  shemasPromise(postPromise());
 });
