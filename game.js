@@ -308,30 +308,30 @@ class Player extends Actor{
 }
 
 //СЛОВАРЬ
-// let bigDictionary = {
-//   'x' : 'wall',
-//   '!' : 'lava',
-//   '@' : Player,
-//   'o' : Coin,
-//   '=' : HorizontalFireball,
-//   '|' : VerticalFireball,
-//   'v' : FireRain
-// };
+let bigDictionary = {
+  'x' : 'wall',
+  '!' : 'lava',
+  '@' : Player,
+  'o' : Coin,
+  '=' : HorizontalFireball,
+  '|' : VerticalFireball,
+  'v' : FireRain
+};
 
 
 //ПАРСЕР УРОВНЯ
 class LevelParser {
-  constructor (dictionary) {
+  constructor (dictionary = {}) {
     // this.dictionary = Object.assign({},bigDictionary, dictionary);
 
     // this.dictionary = dictionary;
-    dictionary['x'] = 'wall';
-    dictionary['!'] = 'lava';
-    dictionary['@'] = Player;
-    dictionary['o'] = Coin;
-    dictionary['='] = HorizontalFireball;
-    dictionary['|'] = VerticalFireball;
-    dictionary['v'] = FireRain;
+    // dictionary['x'] = 'wall';
+    // dictionary['!'] = 'lava';
+    // dictionary['@'] = Player;
+    // dictionary['o'] = Coin;
+    // dictionary['='] = HorizontalFireball;
+    // dictionary['|'] = VerticalFireball;
+    // dictionary['v'] = FireRain;
     this.dictionary = dictionary;
   }
 
@@ -399,10 +399,9 @@ class LevelParser {
 
 
 //ФИНАЛЬНЫЙ ЗАПУСК ИГРЫ
-let jsonFromLL = loadLevels();
-jsonFromLL.then(function () {
-  let schemas = JSON.parse(jsonFromLL);
-  let parser = new LevelParser();
+loadLevels().then(function (jsonResult) {
+  let schemas = JSON.parse(jsonResult);
+  let parser = new LevelParser(bigDictionary);
   runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
 });
 
