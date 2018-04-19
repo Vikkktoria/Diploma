@@ -135,7 +135,6 @@ class Level {
         }
       }
     }
-
     return undefined;
   }
 
@@ -184,7 +183,7 @@ class Level {
 
 
 
-// // ЗАПУСК ИГРЫ
+// // ПЕРВЫЙ ЗАПУСК ИГРЫ
 // const grid = [
 //   new Array(3),
 //   ['wall', 'wall', 'lava']
@@ -406,3 +405,34 @@ jsonFromLL.then(function () {
   let parser = new LevelParser();
   runGame(schemas, parser, DOMDisplay).then(() => alert('Вы выиграли!'));
 });
+
+//ЗАПУСК БЕЗ loadLevels
+// const schemas = [
+//   [
+//     '         ',
+//     '         ',
+//     '    =    ',
+//     '       o ',
+//     '     !xxx',
+//     ' @       ',
+//     'xxx!     ',
+//     '         '
+//   ],
+//   [
+//     '      v  ',
+//     '    v    ',
+//     '  v      ',
+//     '        o',
+//     '        x',
+//     '@   x    ',
+//     'x        ',
+//     '         '
+//   ]
+// ];
+// const actorDict = {
+//   '@': Player,
+//   'v': FireRain
+// }
+// const parser = new LevelParser(actorDict);
+// runGame(schemas, parser, DOMDisplay)
+//   .then(() => console.log('Вы выиграли приз!'));
