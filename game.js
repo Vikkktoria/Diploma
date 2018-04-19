@@ -54,9 +54,10 @@ class Actor  {
     if (obj === this) {
       return false;
     }
-    if ((this.left >= obj.right)||(this.right <= obj.left)||(this.top >= obj.bottom)||(this.bottom <= obj.top)) {
-      return false;
-    } else {return true;}
+    // if ((this.left >= obj.right)||(this.right <= obj.left)||(this.top >= obj.bottom)||(this.bottom <= obj.top)) {
+    //   return false;
+    // } else {return true;}
+    return !((this.left >= obj.right)||(this.right <= obj.left)||(this.top >= obj.bottom)||(this.bottom <= obj.top));
   }
 }
 
@@ -71,11 +72,6 @@ class Level {
 
     this.height = grid.length;
 
-    // let gr = Array.of(0);
-    // grid.forEach(function(el) {
-    //   gr.push(el.length);
-    // })
-    // this.width = Math.max(...gr);
 
     let maxInt = 0;
     grid.forEach(function(el) {
@@ -87,7 +83,6 @@ class Level {
 
     this.finishDelay = 1;
 
-    // this.player = actors.find(el => el.type === 'player');
     const pl =  actors.find(function(el) {
       return el.type === 'player';
     });
@@ -104,7 +99,7 @@ class Level {
     if (!(obj instanceof Actor)||(obj === undefined)) {
       throw new Error('Неверный тип данных');
     }
-    // if (this.actors.length = 1) {return undefined;};
+
     for (let act of this.actors) {
       if (obj.isIntersect(act)) {
         return act;
@@ -130,8 +125,9 @@ class Level {
 
     for (let i = Math.floor(pos.y); i < Math.ceil(pos.y + size.y); i++) {
       for (let j = Math.floor(pos.x); j < Math.ceil(pos.x + size.x); j++) {
-        if (this.grid[i][j] !== undefined) {
-          return this.grid[i][j];
+        let cell = this.grid[i][j];
+        if (!cell) {
+          return cell;
         }
       }
     }
@@ -139,12 +135,6 @@ class Level {
   }
 
   removeActor(actor){
-    // for (let act of this.actors) {
-    //   if (act === actor) {
-    //     this.actors.splice(act, 1);
-    //   }
-    // }
-
     let ind = this.actors.indexOf(actor);
     if (ind !== -1) {
       this.actors.splice(ind, 1);
@@ -226,7 +216,7 @@ class Fireball extends Actor {
 
 //Горизонтальная шаровая молния
 class HorizontalFireball extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0,0)) {
     super(pos);
     this.size = new Vector (1, 1);
     this.speed = new Vector(2, 0);
@@ -235,7 +225,7 @@ class HorizontalFireball extends Fireball {
 
 //Вертикальная шаровая молния
 class VerticalFireball extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0,0)) {
     super(pos);
     this.size = new Vector (1, 1);
     this.speed = new Vector(0, 2);
@@ -244,7 +234,7 @@ class VerticalFireball extends Fireball {
 
 //Огненный дождь
 class FireRain extends Fireball {
-  constructor(pos) {
+  constructor(pos = new Vector(0,0)) {
     super(pos);
     this.position = pos;
     this.size = new Vector (1, 1);
@@ -322,27 +312,12 @@ let bigDictionary = {
 //ПАРСЕР УРОВНЯ
 class LevelParser {
   constructor (dictionary = {}) {
-    // this.dictionary = Object.assign({},bigDictionary, dictionary);
-
-    // this.dictionary = dictionary;
-    // dictionary['x'] = 'wall';
-    // dictionary['!'] = 'lava';
-    // dictionary['@'] = Player;
-    // dictionary['o'] = Coin;
-    // dictionary['='] = HorizontalFireball;
-    // dictionary['|'] = VerticalFireball;
-    // dictionary['v'] = FireRain;
     this.dictionary = dictionary;
   }
 
   actorFromSymbol(symb) {
     return this.dictionary[symb];
   }
-  //   if (symb === undefined) {
-  //     return undefined;
-  //   }
-  //   return this.dictionary[symb];
-  // }
 
   obstacleFromSymbol (symb) {
     if (symb === 'x') {
@@ -388,9 +363,6 @@ class LevelParser {
   parse (proGrid) {
     let grid = this.createGrid(proGrid);
     let actors = this.createActors(proGrid);
-    // actors.forEach(function(el) {
-    //   grid[el.pos.y][el.pos.x] = proGrid[el.pos.y].substr(el.pos.x, 1);
-    // });
 
     return new Level(grid, actors);
   }
