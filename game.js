@@ -126,7 +126,10 @@ class Level {
     for (let i = Math.floor(pos.y); i < Math.ceil(pos.y + size.y); i++) {
       for (let j = Math.floor(pos.x); j < Math.ceil(pos.x + size.x); j++) {
         let cell = this.grid[i][j];
-        if (!cell) {
+        // if (!cell) {
+        //   return cell;
+        // }
+        if (cell != undefined) {
           return cell;
         }
       }
